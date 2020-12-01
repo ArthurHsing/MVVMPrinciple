@@ -4,23 +4,55 @@ const compileUtil = {
       return ac[cu];
     }, vm.$data);
   },
+  setVal(expr, vm, inputVal) {
+    expr.split('.').reduce((ac, cu, index, arr) => {
+      if (index === arr.length - 1) {
+        ac[cu] = inputVal;
+      } else {
+        return ac[cu];
+      }
+    }, vm.$data);
+  },
+  getContentVal(expr, vm) {
+    return expr.replace(/\{\{(.+?)\}\}/g, (match, p) => {
+      return this.getVal(p, vm);
+    });
+  },
   text(node, expr, vm) {
     let value;
     if (expr.indexOf('{{') !== -1) {
       value = expr.replace(/\{\{(.+?)\}\}/g, (match, p) => {
+        new Watcher(vm, p, () => {
+          this.updater.textUpdater(node, this.getContentVal(expr, vm));
+        });
         return this.getVal(p, vm);
       });
     } else {
       value = this.getVal(expr, vm);
+      new Watcher(vm, expr, (newVal) => {
+        this.updater.textUpdater(node, newVal);
+      });
     }
     this.updater.textUpdater(node, value);
   },
   html(node, expr, vm) {
     const value = this.getVal(expr, vm);
+    new Watcher(vm, expr, (newVal) => {
+      this.updater.htmlUpdater(node, newVal);
+    });
     this.updater.htmlUpdater(node, value);
   },
   model(node, expr, vm) {
     const value = this.getVal(expr, vm);
+    // 绑定更新函数 数据=>视图
+    new Watcher(vm, expr, (newVal) => {
+      this.updater.modelUpdater(node, newVal);
+    });
+    // 视图=>数据=>视图
+    node.addEventListener('input', (e) => {
+      // 设置值
+      this.setVal(expr, vm, e.target.value);
+    });
     this.updater.modelUpdater(node, value);
   },
   on(node, expr, vm, eventName) {
@@ -121,6 +153,19 @@ class MVue {
       new Observer(this.$data);
       // 2.实现一个指令解析器
       new Compile(this.$el, this);
+      this.proxyData(this.$data);
+    }
+  }
+  proxyData(data) {
+    for (const key in data) {
+      Object.defineProperty(this, key, {
+        get() {
+          return data[key];
+        },
+        set(newVal) {
+          data[key] = newVal;
+        }
+      });
     }
   }
 }
