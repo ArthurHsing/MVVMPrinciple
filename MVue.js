@@ -136,6 +136,7 @@ class Compile {
     while (firstChild = el.firstChild) {
       f.appendChild(firstChild);
     }
+    console.log(f);
     return f;
   }
   isElementNode(node) {

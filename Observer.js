@@ -50,7 +50,7 @@ class Observer {
   defineReactive(obj, key, value) {
     // 递归遍历
     this.observe(value);
-    const dep = new Dep();
+    const dep = new Dep();  //每一层的对象都拥有一个dep实例
     Object.defineProperty(obj, key, {
       enumerable: true,
       configurable: false,
