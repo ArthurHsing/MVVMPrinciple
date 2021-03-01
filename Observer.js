@@ -17,6 +17,7 @@ class Watcher {
     const newVal = compileUtil.getVal(this.expr, this.vm);
     // 判断该元素上绑定的数据有没有变化，expr是获取数据的点点点表达式
     if (newVal !== this.oldVal) {
+      this.oldVal = newVal; //更新旧值
       this.cb(newVal);
     }
   }

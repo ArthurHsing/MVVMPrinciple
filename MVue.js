@@ -95,6 +95,7 @@ class Compile {
         // 编译文本节点
         this.compileText(child);
       }
+      // 如果当前子节点还有子节点，那么就编译当前子节点
       if (child.childNodes && child.childNodes.length) {
         this.compile(child);
       }
