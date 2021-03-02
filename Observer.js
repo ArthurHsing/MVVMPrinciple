@@ -27,11 +27,11 @@ class Dep {
   constructor() {
     this.subs = [];
   }
-  // 收集观察者
+  // 添加订阅者
   addSub(watcher) {
     this.subs.push(watcher);
   }
-  // 通知观察者去更新
+  // 通知变化
   notify() {
     this.subs.forEach(w => w.update());
   }
@@ -51,7 +51,7 @@ class Observer {
   defineReactive(obj, key, value) {
     // 递归遍历
     this.observe(value);
-    const dep = new Dep();  //每一层的对象都拥有一个dep实例
+    const dep = new Dep();  //对象中的每一个成员都会有一个dep实例
     Object.defineProperty(obj, key, {
       enumerable: true,
       configurable: false,
